@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "invoiceLottery", "invoiceLottery\invoiceLottery.csproj", "{80670B48-0836-4A41-91C8-0FC5F2E369C5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{80670B48-0836-4A41-91C8-0FC5F2E369C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80670B48-0836-4A41-91C8-0FC5F2E369C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80670B48-0836-4A41-91C8-0FC5F2E369C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80670B48-0836-4A41-91C8-0FC5F2E369C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {56528609-D628-44AD-83A5-75D2B6637F74}
+	EndGlobalSection
+EndGlobal
