@@ -23,15 +23,20 @@ namespace invoiceLottery
 
         FilterInfoCollection filterInfoCollection;
         VideoCaptureDevice videoCaptureDevice;
+        List<Invoice> invoices;
+        string qrcodeResult;
         private void Form1_Load(object sender, EventArgs e)
         {
+            invoices = new List<Invoice>();
             //comboBox加入可選擇的年份及月份
-            string[] years = { "109", "110", "111" };
-            string[] months = { "01~02", "03~04", "05~06", "07~08", "09~10", "11~12" };
+            string[] years = { "109", "110", "111", "112" };
+            string[] months = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
             foreach (string year in years)
                 yearComboBox.Items.Add(year);
+            yearComboBox.SelectedIndex = 1;
             foreach (string month in months)
                 monthComboBox.Items.Add(month);
+            monthComboBox.SelectedIndex = 0;
             //讀取可用的webcam
             filterInfoCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             if (filterInfoCollection != null)
@@ -49,9 +54,20 @@ namespace invoiceLottery
         }
         private void addButton_Click(object sender, EventArgs e)
         {
-            //將資料新增至list並顯示出來
-            invoiceListBox.Items.Add(yearComboBox.Text + "年" + monthComboBox.Text + "月\n發票號碼:" + inputTextBox.Text);
-            inputTextBox.Clear();
+            string inputTxt = inputTextBox.Text;
+            if (inputTxt.Count() == 8 && inputTxt.All(char.IsDigit))
+            {
+                Invoice invoice = new Invoice(yearComboBox.Text, monthComboBox.Text, inputTextBox.Text);
+                if (!invoicesHasDuplicate(invoice))
+                {
+                    //將資料新增至list並顯示出來
+                    invoices.Add(invoice);
+                    invoiceListViewShow();
+                    inputTextBox.Clear();
+                }               
+            }
+
+
         }
 
         private void cameraStartButton_Click(object sender, EventArgs e)
@@ -64,20 +80,23 @@ namespace invoiceLottery
                 videoCaptureDevice.Start();
                 timer1.Start();
                 cameraStartButton.Text = "結束偵測";
+                noSignalLabel.Visible = false;
             }
             else
             {
-                    videoCaptureDevice.Stop();
-                    videoCaptureDevice=null;
-                    timer1.Stop();
-                    cameraStartButton.Text = "開始偵測";
+                videoCaptureDevice.Stop();
+                videoCaptureDevice = null;
+                timer1.Stop();
+                cameraStartButton.Text = "開始偵測";
+                cameraPictureBox.Image = null;
+                noSignalLabel.Visible = true;
             }
 
         }
 
         private void VideoCaptureDevice_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
-           //更新畫面
+            //更新畫面
             cameraPictureBox.Image = (Bitmap)eventArgs.Frame.Clone();
         }
 
@@ -99,15 +118,56 @@ namespace invoiceLottery
             {
                 BarcodeReader reader = new BarcodeReader();
                 Result result = reader.Decode((Bitmap)cameraPictureBox.Image);
-                if (result != null && result.ToString() != textBox1.Text)
+                if (result != null && result.ToString() != qrcodeResult)
                 {
                     //把結果更新到textbox上
-                    textBox1.Text = result.ToString();
+                    qrcodeResult = result.ToString();
+                    if (qrcodeResult.Count() > 15)
+                    {
+                        string resulttxt = qrcodeResult.Substring(2, 13);
+                        textBox1.Text = resulttxt;
+                        if (resulttxt.All(char.IsDigit))
+                        {
+                            Invoice invoice = new Invoice(resulttxt.Substring(8, 3), resulttxt.Substring(11, 2), resulttxt.Substring(0, 8));
+                            if (!invoicesHasDuplicate(invoice))
+                            {
+                                invoices.Add(invoice);
+                                invoiceListViewShow();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        textBox1.Text = qrcodeResult;
+                    }
+
+
+
                     // if (videoCaptureDevice.IsRunning)
                     //videoCaptureDevice.Stop();
                     //timer1.Stop();
                 }
             }
+        }
+
+        private void invoiceListViewShow()
+        {
+            invoiceListView.Items.Clear();
+            foreach (Invoice invoice in invoices)
+            {
+                string[] st = { invoice.Year, invoice.Mounth, invoice.Number };
+                var item = new ListViewItem(st);
+                invoiceListView.Items.Add(item);
+            }
+        }
+        private bool invoicesHasDuplicate(Invoice invoice)
+        {
+            foreach (Invoice inv in invoices)
+            {
+                if (inv.Number == invoice.Number && inv.Year == invoice.Year && inv.Mounth == invoice.Mounth)
+                    return true;
+            }
+            return false;
         }
     }
 }
