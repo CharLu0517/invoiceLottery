@@ -8,11 +8,14 @@ namespace invoiceLottery
 {
     public class Invoice
     {
-        private string year, mounth, number;
+        private string year, mounth, number, prize;
+        private int prizeAmt;
         public Invoice(string year, string mounth, string number)
         {
             this.year = year;
             this.number = number;
+            this.prize = "沒中獎";
+            this.prizeAmt = 0;
             switch (mounth)
             {
                 case "01":
@@ -47,5 +50,8 @@ namespace invoiceLottery
         public string Year { get { return year; } }
         public string Mounth { get { return mounth; } }
         public string Number { get { return number; } }
+        public string Prize { get { return prize; } set { prize = value; } }
+        public int PrizeAmt { get { return prizeAmt; } set { prizeAmt = value; } }
+        
     }
 }

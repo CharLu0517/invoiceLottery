@@ -24,6 +24,7 @@ namespace invoiceLottery
         FilterInfoCollection filterInfoCollection;
         VideoCaptureDevice videoCaptureDevice;
         List<Invoice> invoices;
+        Dictionary<string, Prize> prizeDictionary;
         string qrcodeResult;
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -37,6 +38,26 @@ namespace invoiceLottery
             foreach (string month in months)
                 monthComboBox.Items.Add(month);
             monthComboBox.SelectedIndex = 0;
+
+            //載入發票開獎號碼
+            prizeDictionary = new Dictionary<string, Prize>();
+
+            prizeDictionary.Add("11008", new Prize("11008", "52604932",
+                new string[] { "20102509" },
+                new string[] { "39173725 ", "34997398 ", "98953723" },
+                new string[] { "634" },
+                new int[] { 10000000, 2000000, 200000, 40000, 10000, 4000, 1000, 200 }));
+
+            prizeDictionary.Add("11006", new Prize("11006", "51118051",
+               new string[] { "37385202" },
+               new string[] { "27461411  ", "99831976  ", "10229515" },
+               new string[] { "747" },
+               new int[] { 10000000, 2000000, 200000, 40000, 10000, 4000, 1000, 200 }));
+            prizeDictionary.Add("11004", new Prize("11004", "59518250",
+               new string[] { "81016847" },
+               new string[] { "22884739   ", "80660537   ", "62637675" },
+               new string[] { "187" },
+               new int[] { 10000000, 2000000, 200000, 40000, 10000, 4000, 1000, 200 }));
             //讀取可用的webcam
             filterInfoCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             if (filterInfoCollection != null)
@@ -61,10 +82,13 @@ namespace invoiceLottery
                 if (!invoicesHasDuplicate(invoice))
                 {
                     //將資料新增至list並顯示出來
+                    string time = invoice.Year + invoice.Mounth.Substring(3, 2);
+                    if (prizeDictionary.TryGetValue(time,out Prize prize))
+                        invoice = prize.prizeCheck(invoice);
                     invoices.Add(invoice);
                     invoiceListViewShow();
                     inputTextBox.Clear();
-                }               
+                }
             }
 
 
@@ -131,6 +155,9 @@ namespace invoiceLottery
                             Invoice invoice = new Invoice(resulttxt.Substring(8, 3), resulttxt.Substring(11, 2), resulttxt.Substring(0, 8));
                             if (!invoicesHasDuplicate(invoice))
                             {
+                                string time = invoice.Year + invoice.Mounth.Substring(3, 2);
+                                if (prizeDictionary.TryGetValue(time, out Prize prize))
+                                    invoice = prize.prizeCheck(invoice);
                                 invoices.Add(invoice);
                                 invoiceListViewShow();
                             }
@@ -155,7 +182,7 @@ namespace invoiceLottery
             invoiceListView.Items.Clear();
             foreach (Invoice invoice in invoices)
             {
-                string[] st = { invoice.Year, invoice.Mounth, invoice.Number };
+                string[] st = { invoice.Year, invoice.Mounth, invoice.Number, invoice.Prize, invoice.PrizeAmt.ToString() };
                 var item = new ListViewItem(st);
                 invoiceListView.Items.Add(item);
             }
