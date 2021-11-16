@@ -40,12 +40,14 @@ namespace invoiceLottery
         {
             //確認有無中獎
             string num = invoice.Number;
+            //特別
             if (num == superPrizeNo)
             {
                 invoice.Prize = prizeName[0];
                 invoice.PrizeAmt = prizeAmt[0];
                 return invoice;
             }
+            //特獎
             foreach (string s in spcPrizeNo)
             {
                 if (num == s)
@@ -55,6 +57,7 @@ namespace invoiceLottery
                     return invoice;
                 }
             }
+            //二獎~六獎
             foreach (string s in firstPrizeNo)
             {
                 for (int i = 0; i < 6; i++)
@@ -67,7 +70,8 @@ namespace invoiceLottery
                     }
                 }
             }
-            foreach(string s in sixthPrizeNo)
+            //加開六獎
+            foreach (string s in sixthPrizeNo)
             {
                 if(num.Substring(5,3) == s)
                 {
